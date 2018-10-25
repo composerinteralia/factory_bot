@@ -4,19 +4,16 @@ module FactoryBot
     class Association < Attribute
       attr_reader :factory
 
-      def initialize(name, factory, overrides)
+      def initialize(name, options)
         super(name, false)
-        @factory   = factory
-        @overrides = overrides
+        @options = options
+        @factory = @options.factory_name
       end
 
       def to_proc
-        factory   = @factory
-        overrides = @overrides
-        traits_and_overrides = [factory, overrides].flatten
-        factory_name = traits_and_overrides.shift
+        options = @options
 
-        -> { association(factory_name, *traits_and_overrides) }
+        -> { association(options.factory_name, *options.traits_and_overrides) }
       end
 
       def association?

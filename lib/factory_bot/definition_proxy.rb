@@ -131,7 +131,11 @@ module FactoryBot
     #    name of the factory. For example, a "user" association will by
     #    default use the "user" factory.
     def association(name, *options)
-      @definition.declare_attribute(Declaration::Association.new(name, *options))
+      options = FactoryOptions.new(
+        factory_name: name,
+        traits_and_overrides: options
+      )
+      @definition.declare_attribute(Declaration::Association.new(name, options))
     end
 
     def to_create(&block)

@@ -29,8 +29,8 @@ describe FactoryBot::Factory do
   it "returns associations" do
     factory = FactoryBot::Factory.new(:post)
     FactoryBot.register_factory(FactoryBot::Factory.new(:admin))
-    factory.declare_attribute(FactoryBot::Declaration::Association.new(:author, {}))
-    factory.declare_attribute(FactoryBot::Declaration::Association.new(:editor, {}))
+    factory.declare_attribute(association_declaration(:author))
+    factory.declare_attribute(association_declaration(:editor))
     factory.declare_attribute(FactoryBot::Declaration::Implicit.new(:admin, factory))
     factory.associations.each do |association|
       expect(association).to be_association
@@ -39,8 +39,8 @@ describe FactoryBot::Factory do
   end
 
   it "includes associations from the parent factory" do
-    association_on_parent = FactoryBot::Declaration::Association.new(:association_on_parent, {})
-    association_on_child  = FactoryBot::Declaration::Association.new(:association_on_child, {})
+    association_on_parent = association_declaration(:association_on_parent)
+    association_on_child = association_declaration(:association_on_child)
 
     factory = FactoryBot::Factory.new(:post)
     factory.declare_attribute(association_on_parent)
@@ -50,6 +50,11 @@ describe FactoryBot::Factory do
     child_factory.declare_attribute(association_on_child)
 
     expect(child_factory.associations.map(&:name)).to eq [:association_on_parent, :association_on_child]
+  end
+
+  def association_declaration(name)
+    options = FactoryOptions.new(factory_name: name)
+    FactoryBot::Declaration::Association.new(name, options)
   end
 
   describe "when overriding generated attributes with a hash" do

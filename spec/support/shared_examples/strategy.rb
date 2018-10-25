@@ -3,7 +3,11 @@ shared_examples_for "strategy without association support" do
   let(:attribute) { FactoryBot::Attribute::Association.new(:user, :user, {}) }
 
   def association_named(name, overrides)
-    runner = FactoryBot::FactoryRunner.new(name, :build, [overrides])
+    options = FactoryOptions.new(
+      factory_name: name,
+      traits_and_overrides: [overrides],
+    )
+    runner = FactoryBot::FactoryRunner.new(:build, options)
     subject.association(runner)
   end
 
@@ -22,7 +26,11 @@ shared_examples_for "strategy with association support" do |factory_bot_strategy
   let(:factory) { double("associate_factory") }
 
   def association_named(name, strategy, overrides)
-    runner = FactoryBot::FactoryRunner.new(name, strategy, [overrides])
+    options = FactoryOptions.new(
+      factory_name: name,
+      traits_and_overrides: [overrides],
+    )
+    runner = FactoryBot::FactoryRunner.new(strategy, options)
     subject.association(runner)
   end
 
@@ -47,7 +55,11 @@ shared_examples_for "strategy with strategy: :build" do |factory_bot_strategy_na
   let(:factory) { double("associate_factory") }
 
   def association_named(name, overrides)
-    runner = FactoryBot::FactoryRunner.new(name, overrides[:strategy], [overrides.except(:strategy)])
+    options = FactoryOptions.new(
+      factory_name: name,
+      traits_and_overrides: [overrides],
+    )
+    runner = FactoryBot::FactoryRunner.new(options.strategy, options)
     subject.association(runner)
   end
 

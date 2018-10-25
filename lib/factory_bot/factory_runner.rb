@@ -1,32 +1,29 @@
 module FactoryBot
   class FactoryRunner
-    def initialize(name, strategy, traits_and_overrides)
-      @name     = name
+    def initialize(strategy, options)
+      @options = options
       @strategy = strategy
-
-      @overrides = traits_and_overrides.extract_options!
-      @traits    = traits_and_overrides
     end
 
     def run(runner_strategy = @strategy, &block)
-      factory = FactoryBot.factory_by_name(@name)
+      factory = FactoryBot.factory_by_name(@options.factory_name)
 
       factory.compile
 
-      if @traits.any?
-        factory = factory.with_traits(@traits)
+      if @options.has_traits?
+        factory = factory.with_traits(@options.traits)
       end
 
       instrumentation_payload = {
-        name: @name,
+        name: @options.factory_name,
         strategy: runner_strategy,
-        traits: @traits,
-        overrides: @overrides,
+        traits: @options.traits,
+        overrides: @options.overrides,
         factory: factory,
       }
 
       ActiveSupport::Notifications.instrument("factory_bot.run_factory", instrumentation_payload) do
-        factory.run(runner_strategy, @overrides, &block)
+        factory.run(runner_strategy, @options.overrides, &block)
       end
     end
   end

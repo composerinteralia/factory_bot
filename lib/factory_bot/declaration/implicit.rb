@@ -21,7 +21,8 @@ module FactoryBot
 
       def build
         if FactoryBot.factories.registered?(name)
-          [Attribute::Association.new(name, name, {})]
+          options = FactoryOptions.new(factory_name: name)
+          [Attribute::Association.new(name, options)]
         elsif FactoryBot.sequences.registered?(name)
           [Attribute::Sequence.new(name, name, @ignored)]
         else

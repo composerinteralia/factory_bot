@@ -17,7 +17,11 @@ module FactoryBot
       strategy_name = @strategy_name
 
       define_syntax_method(strategy_name) do |name, *traits_and_overrides, &block|
-        FactoryRunner.new(name, strategy_name, traits_and_overrides).run(&block)
+        options = FactoryOptions.new(
+          factory_name: name,
+          traits_and_overrides: traits_and_overrides,
+        )
+        FactoryRunner.new(strategy_name, options).run(&block)
       end
     end
 

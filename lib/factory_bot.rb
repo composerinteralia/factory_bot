@@ -44,6 +44,7 @@ require "factory_bot/decorator/invocation_tracker"
 require "factory_bot/decorator/new_constructor"
 require "factory_bot/linter"
 require "factory_bot/version"
+require "factory_bot/factory_options"
 
 module FactoryBot
   def self.configuration

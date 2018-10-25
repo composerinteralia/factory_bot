@@ -48,7 +48,7 @@ module DeclarationMatchers
     def failure_message
       [
         "expected declarations to include declaration of type #{@declaration_type}",
-        @options ? "with options #{options}" : nil,
+        @options ? "with options #{@options}" : nil,
       ].compact.join " "
     end
 
@@ -58,12 +58,7 @@ module DeclarationMatchers
       case @declaration_type
       when :dynamic     then FactoryBot::Declaration::Dynamic.new(@name, ignored?, @value)
       when :implicit    then FactoryBot::Declaration::Implicit.new(@name, @factory, ignored?)
-      when :association
-        if @options
-          FactoryBot::Declaration::Association.new(@name, options)
-        else
-          FactoryBot::Declaration::Association.new(@name)
-        end
+      when :association then FactoryBot::Declaration::Association.new(@name, options)
       end
     end
 
@@ -72,7 +67,10 @@ module DeclarationMatchers
     end
 
     def options
-      @options || {}
+      FactoryOptions.new(
+        factory_name: @name,
+        traits_and_overrides: [@options].compact,
+      )
     end
   end
 end

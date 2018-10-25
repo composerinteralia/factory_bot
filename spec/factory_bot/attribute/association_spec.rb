@@ -3,8 +3,11 @@ describe FactoryBot::Attribute::Association do
   let(:factory)     { :user }
   let(:overrides)   { { first_name: "John" } }
   let(:association) { double("association") }
+  let(:options) do
+    FactoryOptions.new(factory_name: factory, traits_and_overrides: [overrides])
+  end
 
-  subject { FactoryBot::Attribute::Association.new(name, factory, overrides) }
+  subject { FactoryBot::Attribute::Association.new(name, options) }
 
   module MissingMethods
     def association(*args); end
@@ -30,9 +33,9 @@ describe FactoryBot::Attribute::Association do
     subject.to_proc.call
     expect(subject).to have_received(:association).with(factory, overrides)
   end
-end
 
-describe FactoryBot::Attribute::Association, "with a string name" do
-  subject    { FactoryBot::Attribute::Association.new("name", :user, {}) }
-  its(:name) { should eq :name }
+  context "with a string name" do
+    let(:name) { "name" }
+    its(:name) { should eq :name }
+  end
 end
