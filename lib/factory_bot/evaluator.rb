@@ -21,14 +21,9 @@ module FactoryBot
       end
     end
 
-    def association(factory_name, *traits_and_overrides)
-      options = FactoryOptions.new(
-        factory_name: factory_name,
-        traits_and_overrides: traits_and_overrides,
-      )
+    def association(options)
       strategy = options.strategy ||
         (FactoryBot.use_parent_strategy ? @build_strategy.class : :create)
-
       runner = FactoryRunner.new(strategy, options)
       @build_strategy.association(runner)
     end

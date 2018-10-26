@@ -15,16 +15,12 @@ describe "a generated attributes hash" do
 
     FactoryBot.define do
       factory :user
-      factory :comment
 
       factory :post do
         title { "default title" }
         body { "default body" }
         summary { title }
         user
-        comments do |c|
-          [c.association(:comment)]
-        end
       end
     end
   end
