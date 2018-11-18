@@ -1,24 +1,20 @@
-describe FactoryBot::Factory do
-  before do
-    @name    = :user
-    @class   = define_class("User")
-    @factory = FactoryBot::Factory.new(@name)
-    FactoryBot.register_factory(@factory)
-  end
-
+describe FactoryBot::Factory, :with_test_factories do
   it "has a factory name" do
-    expect(@factory.name).to eq @name
+    factory = FactoryBot.build(:factory, name: :factory_name)
+    expect(factory.name).to eq :factory_name
   end
 
   it "has a build class" do
-    expect(@factory.build_class).to eq @class
+    define_class("User")
+    factory = FactoryBot.build(:factory, name: :user)
+    expect(factory.build_class).to eq User
   end
 
   it "returns associations" do
-    factory = FactoryBot::Factory.new(:post)
-    FactoryBot.register_factory(FactoryBot::Factory.new(:admin))
+    factory = FactoryBot.build(:factory)
     factory.declare_attribute(FactoryBot::Declaration::Association.new(:author, {}))
     factory.declare_attribute(FactoryBot::Declaration::Association.new(:editor, {}))
+    FactoryBot.create(:factory, name: :admin)
     factory.declare_attribute(FactoryBot::Declaration::Implicit.new(:admin, factory))
     factory.associations.each do |association|
       expect(association).to be_association
@@ -30,38 +26,38 @@ describe FactoryBot::Factory do
     association_on_parent = FactoryBot::Declaration::Association.new(:association_on_parent, {})
     association_on_child  = FactoryBot::Declaration::Association.new(:association_on_child, {})
 
-    factory = FactoryBot::Factory.new(:post)
+    factory = FactoryBot.create(:factory)
     factory.declare_attribute(association_on_parent)
-    FactoryBot.register_factory(factory)
 
-    child_factory = FactoryBot::Factory.new(:child_post, parent: :post)
+    child_factory = FactoryBot.build(:factory, parent: factory.name)
     child_factory.declare_attribute(association_on_child)
 
     expect(child_factory.associations.map(&:name)).to eq [:association_on_parent, :association_on_child]
   end
 
   describe "when overriding generated attributes with a hash" do
-    before do
-      @name  = :name
-      @value = "The price is right!"
-      @hash  = { @name => @value }
-    end
-
     it "returns the overridden value in the generated attributes" do
+      define_class("User")
+      factory = FactoryBot.create(:factory, name: :user)
+
       declaration =
-        FactoryBot::Declaration::Dynamic.new(@name, false, -> { flunk })
-      @factory.declare_attribute(declaration)
-      result = @factory.run(FactoryBot::Strategy::AttributesFor, @hash)
-      expect(result[@name]).to eq @value
+        FactoryBot::Declaration::Dynamic.new(:name, false, -> { flunk })
+      factory.declare_attribute(declaration)
+
+      result = factory.run(FactoryBot::Strategy::AttributesFor, name: :value)
+      expect(result[:name]).to eq :value
     end
 
     it "overrides a symbol parameter with a string parameter" do
+      define_class("User")
+      factory = FactoryBot.create(:factory, name: :user)
+
       declaration =
         FactoryBot::Declaration::Dynamic.new(@name, false, -> { flunk })
-      @factory.declare_attribute(declaration)
-      @hash = { @name.to_s => @value }
-      result = @factory.run(FactoryBot::Strategy::AttributesFor, @hash)
-      expect(result[@name]).to eq @value
+      factory.declare_attribute(declaration)
+
+      result = factory.run(FactoryBot::Strategy::AttributesFor, "name" => :value)
+      expect(result[:name]).to eq :value
     end
   end
 

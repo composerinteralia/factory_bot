@@ -18,6 +18,13 @@ RSpec.configure do |config|
 
   config.include DeclarationMatchers
 
+  config.around(with_test_factories: true) do |example|
+    old_paths = FactoryBot.definition_file_paths
+    FactoryBot.definition_file_paths = ["spec/test_factories"]
+    example.run
+    FactoryBot.definition_file_paths = old_paths
+  end
+
   config.before do
     FactoryBot.reload
   end

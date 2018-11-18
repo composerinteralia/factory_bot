@@ -1,20 +1,16 @@
-describe FactoryBot do
-  let(:factory)  { FactoryBot::Factory.new(:object) }
-  let(:sequence) { FactoryBot::Sequence.new(:email) }
-  let(:trait)    { FactoryBot::Trait.new(:admin) }
-
+describe FactoryBot, :with_test_factories do
   it "finds a registered factory" do
-    FactoryBot.register_factory(factory)
+    factory = FactoryBot.create(:factory)
     expect(FactoryBot.factory_by_name(factory.name)).to eq factory
   end
 
   it "finds a registered sequence" do
-    FactoryBot.register_sequence(sequence)
+    sequence = FactoryBot.create(:sequence)
     expect(FactoryBot.sequence_by_name(sequence.name)).to eq sequence
   end
 
   it "finds a registered trait" do
-    FactoryBot.register_trait(trait)
+    trait = FactoryBot.create(:trait)
     expect(FactoryBot.trait_by_name(trait.name)).to eq trait
   end
 end

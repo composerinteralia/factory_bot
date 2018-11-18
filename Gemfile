@@ -9,3 +9,4 @@ gem "sqlite3", "~> 1.3.10", platforms: :ruby
 
 gem "rake"
 gem "rubocop", "0.54", require: false
+gem "byebug"
