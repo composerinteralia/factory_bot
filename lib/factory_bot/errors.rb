@@ -1,4 +1,27 @@
 module FactoryBot
+  # TODO: Define the adapter only if need, perhaps?
+  class KeyErrorAdapter < KeyError
+    def initialize(message, receiver:, key:)
+      @message = message
+      @receiver = receiver
+      @key = key
+    end
+
+    def to_s
+      @message + did_you_mean
+    end
+
+    private
+
+    attr_reader :receiver, :key
+
+    def did_you_mean
+      checker = DidYouMean::SpellChecker.new(dictionary: receiver)
+      suggestions = checker.correct(key).map(&:inspect)
+      DidYouMean.formatter.message_for(suggestions)
+    end
+  end
+
   # Raised when a factory is defined that attempts to instantiate itself.
   class AssociationDefinitionError < RuntimeError; end
 

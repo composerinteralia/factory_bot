@@ -291,6 +291,28 @@ describe "looking up traits that don't exist" do
       expect { FactoryBot.build(:user, double("not a trait")) }
         .to raise_error(KeyError)
     end
+
+    it "adds 'Did you mean?' suggestions at the end of the error message" do
+      define_class("User")
+
+      FactoryBot.define do
+        trait :not_quit
+
+        factory :user do
+          trait :not_quote
+          trait :unrelated
+        end
+      end
+
+      expect { FactoryBot.build(:user, :not_quite) }.to raise_error(
+        KeyError,
+        <<~MSG.strip
+          Trait not registered: "not_quite" referenced within "user" definition
+          Did you mean?  "not_quit"
+                         "not_quote"
+        MSG
+      )
+    end
   end
 
   context "when the factory includes an invalid default trait" do
@@ -313,13 +335,16 @@ describe "looking up traits that don't exist" do
       )
     end
 
-    it "maintains 'Did you mean?' suggestions at the end of the error message" do
+    it "adds 'Did you mean?' suggestions at the end of the error message" do
       define_class("User")
 
       FactoryBot.define do
         trait :not_quit
 
         factory :user do
+          trait :not_quote
+          trait :unrelated
+
           not_quite
         end
       end
@@ -329,6 +354,7 @@ describe "looking up traits that don't exist" do
         <<~MSG.strip
           Trait not registered: "not_quite" referenced within "user" definition
           Did you mean?  "not_quit"
+                         "not_quote"
         MSG
       )
     end
