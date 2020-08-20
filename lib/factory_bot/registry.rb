@@ -39,9 +39,7 @@ module FactoryBot
 
     def key_error_with_custom_message(key_error)
       message = key_error.message.sub("key not found", "#{@name} not registered")
-      error = KeyError.new(message)
-      error.set_backtrace(key_error.backtrace)
-      error
+      Error.with_modified_message(key_error, message)
     end
   end
 end

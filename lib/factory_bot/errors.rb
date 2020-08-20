@@ -1,4 +1,17 @@
 module FactoryBot
+  class Error
+    def self.formatted_did_you_mean(dictionary, key)
+      checker = DidYouMean::SpellChecker.new(dictionary: dictionary)
+      suggestions = checker.correct(key).map(&:inspect)
+      DidYouMean.formatter.message_for(suggestions)
+    end
+
+    def self.with_modified_message(error, message)
+      error.class.new(message).tap do |new_error|
+        new_error.set_backtrace(error.backtrace)
+      end
+    end
+  end
   # Raised when a factory is defined that attempts to instantiate itself.
   class AssociationDefinitionError < RuntimeError; end
 

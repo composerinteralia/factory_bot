@@ -320,6 +320,9 @@ describe "looking up traits that don't exist" do
         trait :not_quit
 
         factory :user do
+          trait :not_quote
+          trait :unrelated
+
           not_quite
         end
       end
@@ -329,6 +332,7 @@ describe "looking up traits that don't exist" do
         <<~MSG.strip
           Trait not registered: "not_quite" referenced within "user" definition
           Did you mean?  "not_quit"
+                         "not_quote"
         MSG
       )
     end

@@ -110,21 +110,20 @@ module FactoryBot
     private
 
     def base_traits
-      @base_traits.map { |name| trait_by_name(name) }
-    rescue KeyError => error
-      raise error_with_definition_name(error)
+      @base_traits.map do |trait_name|
+        trait_by_name(trait_name)
+      rescue KeyError => error
+        message = trait_key_error_message(trait_name)
+        raise Error.with_modified_message(error, message)
+      end
     end
 
-    def error_with_definition_name(error)
-      message = error.message
-      message.insert(
-        message.index("\nDid you mean?") || message.length,
-        " referenced within \"#{name}\" definition"
-      )
+    def trait_key_error_message(trait_name)
+      message = "Trait not registered: \"%s\" referenced within \"%s\" definition"
+      available_traits = defined_traits.map(&:name) + Internal.traits.map(&:name)
+      did_you_mean = Error.formatted_did_you_mean(available_traits, trait_name)
 
-      error.class.new(message).tap do |new_error|
-        new_error.set_backtrace(error.backtrace)
-      end
+      message % [trait_name, name] + did_you_mean
     end
 
     def additional_traits
