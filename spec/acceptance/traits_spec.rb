@@ -307,7 +307,7 @@ describe "looking up traits that don't exist" do
       expect { FactoryBot.build(:user, :not_quite) }.to raise_error(
         KeyError,
         <<~MSG.strip
-          Trait not registered: "not_quite" referenced within "user" definition
+          Trait not registered: "not_quite"
           Did you mean?  "not_quit"
                          "not_quote"
         MSG
