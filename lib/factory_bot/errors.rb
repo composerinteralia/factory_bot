@@ -25,4 +25,46 @@ module FactoryBot
 
   # Raised when any factory is considered invalid
   class InvalidFactoryError < RuntimeError; end
+
+  # Raised when a trait trait is referenced that does not exist
+  # This error behaves like Ruby 2.7 KeyError so that we can get DidYouMean
+  # messages in Ruby 2.5 and 2.6 as well.
+  class KeyErrorAdapter < KeyError
+    class << self
+      def name
+        "KeyError"
+      end
+
+      alias to_s name
+      alias inspect name
+    end
+
+    def inspect
+      "#<KeyError:#{self}>"
+    end
+
+    if ::Gem::Version.new(::RUBY_VERSION) < ::Gem::Version.new("2.7")
+      def initialize(message, receiver:, key:)
+        @message = message
+        @receiver = receiver
+        @key = key
+      end
+
+      def to_s
+        @message + did_you_mean
+      end
+
+      private
+
+      attr_reader :receiver, :key
+
+      def did_you_mean
+        return "" unless defined?(DidYouMean)
+
+        checker = DidYouMean::SpellChecker.new(dictionary: receiver.keys)
+        suggestions = checker.correct(key).map(&:inspect)
+        DidYouMean.formatter.message_for(suggestions)
+      end
+    end
+  end
 end
